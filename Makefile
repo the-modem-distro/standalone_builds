@@ -31,9 +31,9 @@ ifeq ($(TARGET_MACHINE), mdm9607)
 	KERNEL_OUTPUT_FILE="target/boot-mdm9607.img"
 	KERNEL_OUTPUT_DTB=$(CURRENT_PATH)/target/dtb_mdm9607.img
 	# Mainline
-	KERNEL_CMD_PARAMS="console=ttyMSM0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 log_buf_len=4M"
+	KERNEL_CMD_PARAMS="console=ttyMSM0,115200,n8 log_buf_len=4M"
 	# Ancient, fossilized kernel
-	#KERNEL_CMD_PARAMS="earlycon console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 log_buf_len=4M"
+	# KERNEL_CMD_PARAMS="earlycon console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 log_buf_len=4M"
 
 else ifeq ($(TARGET_MACHINE), mdm9640)
 	ABOOT_TOOLCHAIN="arm-none-eabi-"
@@ -87,11 +87,11 @@ kernel_menuconfig:
 kernel_build:
 	cd $(KERNEL_PATH) ; [ ! -f build/.config ] && echo -e "Please run make kernel_defconfig first!" && exit 1 ;\
 	make ARCH=arm CROSS_COMPILE=$(KERNEL_TOOLCHAIN) CC=$(KERNEL_TOOLCHAIN)gcc $(CCFLAGS) LD=$(KERNEL_TOOLCHAIN)ld.bfd -j 12 O=build -k || exit ; \
-	$(CURRENT_PATH)/tools/dtbTool $(KERNEL_PATH)/build/arch/arm/boot/dts/$(KERNEL_DTS_TREE) -s $(KERNEL_PAGE_SIZE) \
-	-o $(KERNEL_OUTPUT_DTB) -p $(KERNEL_PATH)/build/scripts/dtc/ \
+	$(CURRENT_PATH)/tools/dtbtool $(KERNEL_PATH)/build/arch/arm/boot/dts/$(KERNEL_DTS_TREE) -s $(KERNEL_PAGE_SIZE) -o $(KERNEL_OUTPUT_DTB) -p $(KERNEL_PATH)/build/scripts/dtc/ \
 
 	$(CURRENT_PATH)/tools/mkbootimg --kernel $(KERNEL_PATH)/build/arch/arm/boot/zImage \
 		--ramdisk $(CURRENT_PATH)/tools/init.gz \
+		--ramdisk_offset 0x00 \
 		--output ${KERNEL_OUTPUT_FILE} \
 		--pagesize $(KERNEL_PAGE_SIZE) \
 		--base $(KERNEL_BASE) \

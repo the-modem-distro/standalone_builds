@@ -26,3 +26,6 @@ else
     git pull && \
     cd $BASE_PATH
 fi
+
+cd $BASE_PATH/tools/src/dtbtool && make && mv dtbtool $BASE_PATH/tools/
+cd $BASE_PATH/tools/src/mkbootimg && make && mv mkbootimg $BASE_PATH/tools
